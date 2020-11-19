@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using RGB.NET.Core;
 using SimpleLed;
 
 namespace Driver.RGBnet
 {
-    public class RGBNetDriver : ISimpleLed
+    public class RGBNetDriver : ISimpleLedWithConfig
     {
         public TimerUpdateTrigger UpdateTrigger { get; private set; }
 
@@ -21,6 +23,10 @@ namespace Driver.RGBnet
 
         public event Events.DeviceChangeEventHandler DeviceAdded;
         public event Events.DeviceChangeEventHandler DeviceRemoved;
+
+        public static Assembly assembly = Assembly.GetExecutingAssembly();
+        public static Stream imageStream = assembly.GetManifestResourceStream("Driver.RGBnet.argebee.png");
+
 
         public void Configure(DriverDetails driverDetails)
         {
@@ -48,9 +54,9 @@ namespace Driver.RGBnet
                         }
                     }
                 }
-                catch
+                catch(Exception e)
                 {
-
+                    Console.WriteLine(e.Message);
                 }
             }
 
@@ -64,15 +70,26 @@ namespace Driver.RGBnet
                 slsDevice.DeviceType = DeviceTypeConverter.GetType(device.DeviceInfo.DeviceType);
                 slsDevice.Driver = this;
                 slsDevice.Has2DSupport = false;
+                slsDevice.ProductImage = (Bitmap) System.Drawing.Image.FromStream(imageStream);
+
 
                 List<ControlDevice.LedUnit> deviceLeds = new List<ControlDevice.LedUnit>();
 
+                int i = 0;
+
                 foreach (Led led in device)
                 {
-                    ControlDevice.LedUnit newLed = new ControlDevice.LedUnit();
+                    RGBNetLed newLed = new RGBNetLed();
                     newLed.Data = new ControlDevice.LEDData();
-                    newLed.Data.LEDNumber = (int) led.Id;
+                    newLed.Data.LEDNumber = i;
+                    i++;
+                    newLed.LedId = (int) led.Id;
+                    deviceLeds.Add(newLed);
                 }
+
+                slsDevice.LEDs = deviceLeds.ToArray();
+
+                DeviceAdded?.Invoke(slsDevice, new Events.DeviceChangeEventArgs(slsDevice));
             }
 
             UpdateTrigger = new TimerUpdateTrigger { UpdateFrequency = 1.0 / 30 };
@@ -88,7 +105,7 @@ namespace Driver.RGBnet
 
         public T GetConfig<T>() where T : SLSConfigData
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public DriverProperties GetProperties()
@@ -101,10 +118,10 @@ namespace Driver.RGBnet
                 SupportsCustomConfig = true,
                 Id = Guid.Parse("09fc46d2-6880-487f-9a8e-16b907b20eb1"),
                 Author = "Fanman03",
-                Blurb = "Compatibility layer that allows RGB.NET plugins to be used in SLS-based apps.",
+                Blurb = "Compatibility layer that allows RGB.NET providers to be used in SLS-based apps.",
                 CurrentVersion = new ReleaseNumber(1, 0, 0, 1),
                 GitHubLink = "https://github.com/SimpleLed/Driver.RGBNet",
-                IsPublicRelease = false,
+                IsPublicRelease = true,
             };
         }
 
@@ -129,19 +146,41 @@ namespace Driver.RGBnet
 
         public void Push(ControlDevice controlDevice)
         {
-            foreach (ControlDevice.LedUnit slsLED in controlDevice.LEDs)
+            foreach (RGBNetLed slsLED in controlDevice.LEDs)
             {
-                Led rgbNetLed = RGBSurface.Instance.Leds.First(led => led.Id == (LedId)slsLED.Data.LEDNumber);
-                double r = slsLED.Color.Red / 255;
-                double g = slsLED.Color.Green / 255;
-                double b = slsLED.Color.Blue / 255;
-                rgbNetLed.Color = new Color(r,g,b);
+                Led rgbNetLed = RGBSurface.Instance.Leds.First(led => led.Id == (LedId)slsLED.LedId);
+                double r = slsLED.Color.Red / 255.0;
+                double g = slsLED.Color.Green / 255.0;
+                double b = slsLED.Color.Blue / 255.0;
+                rgbNetLed.Color = new RGB.NET.Core.Color(r,g,b);
             }
         }
 
         public void PutConfig<T>(T config) where T : SLSConfigData
         {
-            throw new NotImplementedException();
+            
+        }
+
+        public UserControl GetCustomConfig(ControlDevice controlDevice)
+        {
+            var config = new RGBNetConfig();
+
+            return config;
+        }
+
+        public bool GetIsDirty()
+        {
+            return false;
+        }
+
+        public void SetIsDirty(bool val)
+        {
+            
+        }
+
+        public class RGBNetLed : ControlDevice.LedUnit
+        {
+            public int LedId { get; set; }
         }
     }
 }
