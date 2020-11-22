@@ -21,11 +21,11 @@ namespace Driver.RGBnet
                 case RGBDeviceType.Mouse:
                     return DeviceTypes.Mouse;
                 case RGBDeviceType.Headset:
-                    return DeviceTypes.Mouse;
+                    return DeviceTypes.Headset;
                 case RGBDeviceType.HeadsetStand:
-                    return DeviceTypes.Mouse;
+                    return DeviceTypes.HeadsetStand;
                 case RGBDeviceType.Mousepad:
-                    return DeviceTypes.Mouse;
+                    return DeviceTypes.MousePad;
                 case RGBDeviceType.Cooler:
                     return DeviceTypes.Cooler;
                 case RGBDeviceType.GraphicsCard:
