@@ -84,6 +84,7 @@ namespace Driver.RGBnet
                     newLed.Data.LEDNumber = i;
                     i++;
                     newLed.LedId = (int) led.Id;
+                    newLed.DeviceName = led.Device.DeviceInfo.DeviceName;
                     deviceLeds.Add(newLed);
                 }
 
@@ -119,7 +120,7 @@ namespace Driver.RGBnet
                 Id = Guid.Parse("09fc46d2-6880-487f-9a8e-16b907b20eb1"),
                 Author = "Fanman03",
                 Blurb = "Compatibility layer that allows RGB.NET providers to be used in SLS-based apps.",
-                CurrentVersion = new ReleaseNumber(1, 0, 0, 1),
+                CurrentVersion = new ReleaseNumber(1, 0, 0, 2),
                 GitHubLink = "https://github.com/SimpleLed/Driver.RGBNet",
                 IsPublicRelease = true,
             };
@@ -137,9 +138,10 @@ namespace Driver.RGBnet
 
         public void Pull(ControlDevice controlDevice)
         {
-            foreach (ControlDevice.LedUnit slsLED in controlDevice.LEDs)
+            foreach (ControlDevice.LedUnit ledUnit in controlDevice.LEDs)
             {
-                Led rgbNetLed = RGBSurface.Instance.Leds.First(led => led.Id == (LedId)slsLED.Data.LEDNumber);
+                RGBNetLed slsLED = (RGBNetLed) ledUnit;
+                Led rgbNetLed = RGBSurface.Instance.Leds.First(led => led.Id == (LedId)slsLED.LedId && led.Device.DeviceInfo.DeviceName == slsLED.DeviceName);
                 slsLED.Color = new LEDColor((int) rgbNetLed.Color.R * 255, (int)rgbNetLed.Color.G * 255, (int)rgbNetLed.Color.B * 255);
             }
         }
@@ -148,7 +150,7 @@ namespace Driver.RGBnet
         {
             foreach (RGBNetLed slsLED in controlDevice.LEDs)
             {
-                Led rgbNetLed = RGBSurface.Instance.Leds.First(led => led.Id == (LedId)slsLED.LedId);
+                Led rgbNetLed = RGBSurface.Instance.Leds.First(led => led.Id == (LedId)slsLED.LedId && led.Device.DeviceInfo.DeviceName == slsLED.DeviceName);
                 double r = slsLED.Color.Red / 255.0;
                 double g = slsLED.Color.Green / 255.0;
                 double b = slsLED.Color.Blue / 255.0;
@@ -181,6 +183,8 @@ namespace Driver.RGBnet
         public class RGBNetLed : ControlDevice.LedUnit
         {
             public int LedId { get; set; }
+
+            public string DeviceName { get; set; }
         }
     }
 }

@@ -35,7 +35,8 @@ namespace Driver.RGBnet
                 string templatePath = Directory.GetCurrentDirectory() +
                                       "\\SLSProvider\\09fc46d2-6880-487f-9a8e-16b907b20eb1\\PluginManager.Settings.json";
 
-                File.Copy(templatePath, settingsPath);
+                if(!File.Exists(settingsPath))
+                    File.Copy(templatePath, settingsPath);
 
                 string pmPath = Directory.GetCurrentDirectory() +
                                     "\\SLSProvider\\09fc46d2-6880-487f-9a8e-16b907b20eb1\\PluginManager.exe";
