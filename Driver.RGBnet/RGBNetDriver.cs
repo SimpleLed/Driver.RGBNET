@@ -119,8 +119,8 @@ namespace Driver.RGBnet
                 SupportsCustomConfig = true,
                 Id = Guid.Parse("09fc46d2-6880-487f-9a8e-16b907b20eb1"),
                 Author = "Fanman03",
-                Blurb = "Compatibility layer that allows RGB.NET providers to be used in SLS-based apps.",
-                CurrentVersion = new ReleaseNumber(1, 0, 0, 2),
+                Blurb = "Compatibility layer that allows RGB.NET providers to be used in SLS-based apps. RGB.NET library by Darth Affe.",
+                CurrentVersion = new ReleaseNumber(1, 0, 0, 3),
                 GitHubLink = "https://github.com/SimpleLed/Driver.RGBNet",
                 IsPublicRelease = true,
             };
