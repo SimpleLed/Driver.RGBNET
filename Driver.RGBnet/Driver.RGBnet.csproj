@@ -37,7 +37,7 @@
       <HintPath>..\..\TestHarness\packages\RGB.NET.Core.0.1.33\lib\net45\RGB.NET.Core.dll</HintPath>
     </Reference>
     <Reference Include="SimpleLed, Version=1.0.0.4, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\TestHarness\packages\SimpleLed.1.1.8\lib\net472\SimpleLed.dll</HintPath>
+      <HintPath>..\packages\SimpleLed.1.1.13\lib\net472\SimpleLed.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
